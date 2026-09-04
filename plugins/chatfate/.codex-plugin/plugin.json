@@ -1,0 +1,36 @@
+{
+  "name": "chatfate",
+  "version": "0.5.7+codex.20260905",
+  "description": "Generate deterministic Bazi or Liuyao charts and evidence-linked reports in Codex.",
+  "author": {
+    "name": "ChatFate",
+    "url": "https://chatfate.cc"
+  },
+  "homepage": "https://chatfate.cc",
+  "repository": "https://github.com/ChatFate/agent-plugin.git",
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "ChatFate",
+    "shortDescription": "Choose Liuyao or Bazi and generate a private structured report.",
+    "longDescription": "ChatFate presents a two-stage card for Liuyao or Bazi, calculates deterministic facts on its hosted service, asks Codex for evidence-linked interpretation, and opens a private report in the built-in Browser.",
+    "developerName": "ChatFate",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://chatfate.cc",
+    "privacyPolicyURL": "https://chatfate.cc/privacy",
+    "termsOfServiceURL": "https://chatfate.cc/terms",
+    "brandColor": "#0D0D0D",
+    "composerIcon": "./assets/composer-icon.png",
+    "logo": "./assets/logo.png",
+    "logoDark": "./assets/logo.png",
+    "defaultPrompt": [
+      "开始使用 ChatFate",
+      "帮我排八字",
+      "帮我用六爻问一卦"
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+interface:
+  display_name: "ChatFate"
+  short_description: "在双入口卡片中选择六爻或八字并生成确定性报告"
+  default_prompt: "使用 $chatfate 开始使用 ChatFate。"
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,81 @@
+---
+name: liuyao
+description: 基于本地确定性六爻引擎生成的 chatfate.liuyao.chart.v2 卦盘，按判词先行、三层模块、同问声明和敏感问题软着陆的当前合同输出 chatfate.liuyao.interpretation.v2。仅在总编排 Skill 请求生成六爻报告解释时使用；不得手工起卦、改变 seed、替引擎选择用神、修改确定性事实或脱离 calculatedFacts 作断语。
+---
+
+# 问事起卦解读
+
+## 输入门槛
+
+只处理 `schemaVersion: "chatfate.liuyao.chart.v2"` 的完整卦盘。开始前确认存在：
+
+- `engine`、`engineVersion`、`normalizedInput` 和 `normalizedInput.subject`
+- `calculatedFacts.baseHexagram`
+- `calculatedFacts.ganZhiTime`
+- `calculatedFacts.lines`，且恰好包含从初爻到上爻的六条记录
+- `calculatedFacts.movingLinePositions`
+- `calculatedFacts.shiLinePosition` 和 `calculatedFacts.yingLinePosition`
+- `calculatedFacts.useGod`
+
+任一必要事实缺失、爻位重复或六爻不全时停止解释并返回结构化错误。不要询问用户，也不要自行起卦、装卦或补算。
+
+## 事实边界
+
+- 将 `calculatedFacts` 视为只读真值，不纠正卦名、纳甲、六亲、六神、世应、旬空、旺衰、动变、伏神、神煞或应期线索。
+- 只引用当前对象内真实存在的路径；不要根据传统口诀补出引擎未返回的字段。
+- 将引擎给出的 `useGod.groups` 视为候选与选择状态。选择未决或多候选并存时，保留分支解释，不替引擎拍板。
+- `normalizedInput.subject` 只用于解释引擎已经给出的确定性用神映射：`self` 延用主题映射，`family` 解释父母爻映射，`friend` 解释兄弟爻映射。subject 不进入 seed，不改变卦盘，也不授权模型另选用神。
+- 只解释 `timingTriggers` 已给出的触发条件，不把它扩写成必然日期或结果保证。方向性行动只允许出现在 `verdict.action` 或参考层，并限于下方白名单。
+- 不用用户后续反馈反推或改写卦盘，也不通过追问私密经历来“校准”结果。
+
+## 解释流程
+
+1. 读取 [解释框架](references/interpretation-framework.md)。
+2. 读取 [事实与证据指南](references/evidence-guide.md)。
+3. 读取 [来源说明](references/source-notes.md) 和 [安全语言](references/safety-language.md)。
+4. 建立事实索引，只保留会写进解释、并已验证可解析的 `calculatedFacts.*` 路径。
+5. 按以下顺序分析，不能跳过前层直接下结论：
+   - 所问主题与用神候选。
+   - 月日影响、旺衰状态与旬空。
+   - 动爻、变爻和变卦。
+   - 世应位置及双方结构。
+   - 伏神、六神、卦身、神煞和应期触发等补充信息。
+6. 分析完成后先合成 `verdict`：
+   - `judgment` 非空，收敛整卦方向并引用至少两个独立事实组。
+   - `timing` 只来自 `calculatedFacts.timingTriggers`；没有可靠触发或进入 safety mode 时为 `null`。
+   - `action` 非空，只能从调整节奏、收尾兑现、主动沟通、准备打磨、休整蓄力、择时行动、规避具体风险面中选择一个清晰动作。
+7. 再按 `questionFocus → trend → movingLines → timing（可选）` 输出模块；每个模块依次写 `duanyu`、`shiyi`、`cankao`，三层正文不得复制或拆句填充。给不出非空参考时合并或删除该模块。
+8. 对每条解释附加至少一个 `evidenceRefs`，仅允许引用 `calculatedFacts.*`。
+   数组索引可写成 `calculatedFacts.lines.0` 或 `calculatedFacts.lines[0]`；不要使用带引号的方括号属性。
+9. 综合判断至少引用两个独立事实路径。引擎事实复述可标 `high`；传统关系解释通常不超过 `medium`；候选未决、流派相关或替代解释明显时标 `low`。置信度只进数据字段和边界章取舍，不进正文语气；低置信内容降入 boundaries 或不写。
+10. 做一致性检查：
+   - 每个卦名、爻位、六亲、地支、旺衰状态与时间条件均与引用路径一致。
+   - 没有把单一神煞、六神或爻象当作决定性证据。
+   - 没有把“发动”“旬空”“冲合”等词扩写成引擎未提供的具体事件。
+   - 没有把应期触发写成结果保证。
+    - 经文链遵循“卦名 → 经文 → 释经 → 盘面 → 所问”，模型不伪造或改写静态经文。
+11. 严格输出 `chatfate.liuyao.interpretation.v2` 对象，不添加聊天式前言或结尾。
+
+## 输出合同
+
+- `schemaVersion`：固定为 `chatfate.liuyao.interpretation.v2`。
+- `verdict`：
+  - `judgment`：一条非空 Item。
+  - `timing`：一条 Item 或 `null`。
+  - `action`：一条非空 Item。
+- `repeatNotice`：总编排没有确认同问时为 `null`；确认后逐字写：`此事已有初筮。初筮告，再三渎，渎则不告——断以初卦为准，本卦仅作参照。`
+- `safetyMode`：布尔值。
+- `modules`：规范顺序 `questionFocus → trend → movingLines → timing（可选）`；保留模块的 `duanyu`、`shiyi`、`cankao` 均非空。
+- `boundaries`：3–5 条具体边界，每条引用造成限制的真实事实。
+
+Item 始终为 `{ text, evidenceRefs, confidence }`。不要复制完整问题或卦盘表；报告渲染器会读取确定性输入、事实和静态经文表。
+
+## 敏感问题
+
+问生死、重病、自伤、急性危险、官司结果、犯罪、失踪、重大投资或其他需要医疗／心理／法律／金融／安全专业介入的问题时：
+
+- 设 `safetyMode: true`。
+- 风险如实点出，不回避、不渲染恐惧，不给保证。
+- `verdict.timing` 必须为 `null`，并删除 timing 模块。
+- `verdict.action` 写当下可做之事和对应现实专业帮助；不得让占卜替代专业判断。
+- 凶必配“怎么办”。真实危机退出玄学语境，明确建议就医、报警、联系律师、心理援助或其他与情境对应的专业帮助。

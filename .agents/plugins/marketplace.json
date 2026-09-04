@@ -1,0 +1,20 @@
+{
+  "name": "chatfate",
+  "interface": {
+    "displayName": "ChatFate"
+  },
+  "plugins": [
+    {
+      "name": "chatfate",
+      "source": {
+        "source": "local",
+        "path": "./plugins/chatfate"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
