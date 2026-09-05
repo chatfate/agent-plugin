@@ -62,7 +62,7 @@
 ## 六爻 interpretation v2
 
 - `schemaVersion`：`chatfate.liuyao.interpretation.v2`。
-- `verdict.judgment`：非空总判断，至少引用两个独立事实组。
+- `verdict.judgment`：非空总判断，至少引用两个独立事实组；串起所问、卦意和变化条件，可在同一字符串内用空行分段。摘要写作深度见六爻 Skill，不增加字段。
 - `verdict.timing`：可为 `null`；非空时只引用 `calculatedFacts.timingTriggers` 的真实触发条件，不制造日期与结果保证。
 - `verdict.action`：非空白名单动作，可复用 judgment 的事实路径。
 - `repeatNotice`：只有总编排确认同一会话、同一件事的再次起卦后写入冻结原句；否则为 `null`。
@@ -76,3 +76,7 @@
 - 无论 Browser 是否成功，最终回复都固定为 `报告已生成：<reportUrl>`，并逐字保留完整 URL。
 - 完整 URL 的路径中包含不可猜测的 `accessId`，报告链接不含 fragment 解密密钥。不能截断、改写或省略；用户关闭 Browser 后依靠会话中的同一完整链接重新打开。
 - 除传给内置 Browser 打开外，该链接不写入日志、无关工具参数或公开位置，也不向非预期读者转发。
+
+## 预览与完整报告的写作分工
+
+免费预览展示真实概要与行动建议，读者应能看懂当前的判断、依据及需要兼顾的条件；完整报告继续展开各主题的理由与排盘记录。不同产品按子 Skill 的长度与深度写作，不能靠重复句子增加篇幅，也不能藏起关键限制诱导付款。用户可见文字采用自然中文，技术词只留在操作说明和数据字段中。

@@ -19,9 +19,9 @@ description: 必须先按本轮 Skills 清单给出的 file 路径读取本 Skil
 1. 用户要求开始测算时，先应用下方六爻同问预检；不触发或已确认后，第一项工具动作是 `render_divination_menu`。调用前不输出 commentary、说明或处理中状态。即使聊天中有部分信息，也由卡片收集。
 2. 取得 `sessionId` 后，同一个模型回合立即调用 `wait_for_divination_data`。它等待卡片提交并返回经过验证的 `submissionId`；不要结束回合、要求用户再说一句话或调用 `sendFollowUpMessage`、`ui/message`、`updateModelContext`。
 3. 等待结果只提供已验证的 `submissionId` 与 `kind` 等流程信息，不假定它包含 product／targetYear。根据 `kind` 调用 `calculate_bazi_chart` 或 `calculate_liuyao_chart`，只传 `submissionId`。登录错误按下方处理，不重开卡片。若返回 `status: "report_ready"` 与 `reportUrl`，表示同账号当天已有日报：在本轮已有的 ChatFate 标签导航到该 reportUrl（没有则新开），按第 7 步交付完整原链接，跳过第 4–6 步；不读取子 Skill、不再生成 interpretation、不调用 create。其他成功结果必须有 `calculationId`、`engineVersion`、`calculatedFacts` 和对应 chart 版本；以计算返回的 `reading.product` 确定产品，`daily` 还须有匹配 `reading.targetDate` 的 `calculatedFacts.dailyTransit`。旧返回没有 reading 时，仅按八字 life／六爻 question 兼容。
-4. 成功排盘后，本轮尚未打开登录页时，打开 `https://chatfate.cc/pending/<calculationId>`；它会自动转到报告。本轮已打开登录页时沿用该页，不重复开等待页。
+4. 成功排盘后，本轮尚未打开登录页时，打开 `https://chatfate.cc/pending/<calculationId>`；它会自动转到报告。本轮已打开登录页时沿用该页，不重复开等待页。页面交付和第 5 步文件读取互不依赖，可同时调度；首次需要读取 Browser 技能时也并入同一次文件读取。不要等等待页加载完成、截图或查进度后才开始解读；浏览器不可用时直接继续报告生成。
 5. 只读取实际分支的子 Skill：八字为 `../bazi/SKILL.md`，六爻为 `../liuyao/SKILL.md`。与 [报告契约](references/report-contract.md)、[表达边界](references/safety.md) 一次批量读取；当前上下文已读且版本未变时直接复用。子 Skill 的扩展 references 只在相应事实、规则或出处不清楚时读取，不默认加载另一分支或逐文件重复读取。
-6. 根据已返回事实和 reading 生成一次对应产品的 interpretation：daily／annual 用 focused.v1，life 用八字 v3，question 用六爻 v2；先检查必填层数、证据路径和具体事实，再调用 `create_divination_report({ calculationId, interpretation })`。不要把原始输入或整个 chart 重新传回。
+6. 根据已返回事实和 reading 生成一次对应产品的 interpretation：daily／annual 用 focused.v1，life 用八字 v3，question 用六爻 v2；先检查必填层数、证据路径和具体事实，再调用 `create_divination_report({ calculationId, interpretation })`。写作时直接自查：概要是否先回答本问，是否说清支持判断的依据、会改变判断的条件，以及可以在现实中核对的一步；证据不足就收窄判断，不靠字数或术语撑深度，也不把“稳住节奏、结合实际、适时调整”当作整条结论。无需再调用一次模型审稿。不要把原始输入或整个 chart 重新传回。
 7. 工具成功后，沿用本轮已交付的 ChatFate 标签；本轮从未打开过登录页或等待页时，立即打开工具返回的 `reportUrl`。最终回复固定为 `报告已生成：<reportUrl>`，完整链接逐字保留，不复述报告正文。
 
 正常路径只有：卡片 → 同轮等待 → 确定性计算 → 解释 → 一次报告写入。不要先搜索外网、查安装状态、轮询站点、重复计算、重读已在上下文中的文档或为润色重复写入报告。校验失败只修正指出的字段，沿用同一 `calculationId` 重试；网络超时沿用相同 interpretation 重试。
@@ -41,20 +41,24 @@ description: 必须先按本轮 Skills 清单给出的 file 路径读取本 Skil
 
 ## 在内置浏览器打开页面
 
-先读取本轮可用的 Control In App Browser 技能，并按该技能初始化浏览器运行时。ChatFate 的授权、等待、历史和报告页面都使用 `iab`；打开每页后保留为 deliverable：
+先读取本轮可用的 Control In App Browser 技能，并按该技能初始化浏览器运行时。ChatFate 的授权、等待、历史和报告页面都使用 `iab`。已有本轮 ChatFate 交付标签及其持久变量时，直接用它导航和保留，不再创建标签。仅在尚未建立这些绑定时执行以下初始化，后续复用变量，不能重复声明；不要使用 `globalThis`：
 
 ```js
-if (globalThis.iab == null) {
-  globalThis.iab = await agent.browsers.get("iab");
-  nodeRepl.write(await iab.documentation());
-}
-const tab = await iab.tabs.new();
-await tab.goto("<URL>");
-await (await iab.capabilities.get("visibility")).set(true);
-await iab.tabs.finalize({ keep: [{ tab, status: "deliverable" }] });
+const chatfateBrowser = await agent.browsers.get("iab");
+nodeRepl.write(await chatfateBrowser.documentation());
+```
+
+读完返回的完整浏览器文档后，再创建本轮第一个交付标签；已有标签则跳过创建并复用：
+
+```js
+let chatfateTab = await chatfateBrowser.tabs.new();
+await chatfateTab.goto("<URL>");
+await (await chatfateBrowser.capabilities.get("visibility")).set(true);
+await chatfateBrowser.tabs.finalize({ keep: [{ tab: chatfateTab, status: "deliverable" }] });
 ```
 
 - 本回合有多个需要保留的 ChatFate 标签时，`keep` 列出全部。禁止不带 `keep` 的 `finalize()`、关闭交付标签或隐藏浏览器。
+- 后续只调用 `chatfateTab.goto(...)`、显示浏览器和带 `keep` 的 `finalize(...)`；标签名称采用初始化时真实使用的变量名，不重复执行 `tabs.new()`。
 - 不用 `getForUrl()`、`getDefault()`、extension、chrome 或其他已有 browser 绑定猜浏览器。出现画中画表示选错，使用 `iab` 重开同一 URL。
 - 这是交付动作，不为报告生成做浏览器截图、点击、读页面状态或重复导航；登录结果由原工具重试确认。标签在回合结束后保留依赖 `finalize({ keep: … })`，仅 `set(true)` 不足。
 - 内置 Browser 不可用或打开失败时，不阻塞已生成报告的交付：仍逐字返回完整 `reportUrl`，作为恢复入口。不要把浏览器失败说成报告失败。
