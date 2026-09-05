@@ -1,11 +1,13 @@
 ---
 name: bazi
-description: 基于 ChatFate 排盘引擎生成的 chatfate.bazi.chart.v2 事实，输出判断先行的命局速写、三层盘理、四域参考与三层总参考，形成 chatfate.bazi.interpretation.v3。仅在 ChatFate 总编排 Skill 请求生成八字报告解释时使用；不得收集出生信息、手工排盘、校准历史事件、修改确定性事实或脱离 calculatedFacts 作断语。
+description: 基于 ChatFate 排盘引擎生成的 chatfate.bazi.chart.v2 事实，输出判断先行的命局速写、三层盘理、四域参考与三层总参考，按 reading.product 输出人生命盘 chatfate.bazi.interpretation.v3，或今日／年度 chatfate.bazi.focused.v1。仅在 ChatFate 总编排 Skill 请求生成八字报告解释时使用；不得收集出生信息、手工排盘、校准历史事件、修改确定性事实或脱离 calculatedFacts 作断语。
 ---
 
 # 八字命局解读
 
 ## 输入门槛
+
+计算工具若已返回 `status: "report_ready"`，由总编排直接交付原报告，不执行本 Skill 或生成第二份解释。
 
 只处理 `schemaVersion: "chatfate.bazi.chart.v2"` 的完整排盘对象。开始前确认存在：
 
@@ -20,6 +22,13 @@ description: 基于 ChatFate 排盘引擎生成的 chatfate.bazi.chart.v2 事实
 
 任一必要事实缺失时停止解释并返回结构化错误。不要询问用户，也不要自行补算。
 
+## 先确定产品
+
+- `reading.product=life` 或旧返回没有 reading：使用下方人生命盘 v3 合同。
+- `reading.product=daily|annual`：只使用下方“今日／年度精简合同”。共同事实、安全与证据规则继续适用，但不生成 life 的四域和三层 overallGuidance。
+- daily 必须存在 `calculatedFacts.dailyTransit`，其 `date` 与 `reading.targetDate` 以及 `calculatedFacts.asOfDate` 一致；timezone 为 `Asia/Shanghai`、dayBoundary 为 `midnight`。缺失或冲突时返回错误，不用六爻、不补算日干支。
+- annual 必须满足 `calculatedFacts.liunian.year === reading.targetYear`；`asOfDate` 是目标年的 7 月 1 日。流年以立春为界，这是为年度主题选择的固定观察快照，不是逐月预测，也不证明该快照的大运覆盖一整年。
+
 ## 事实边界
 
 - 将 `calculatedFacts` 视为只读真值，不纠正、重排或覆盖。
@@ -30,7 +39,7 @@ description: 基于 ChatFate 排盘引擎生成的 chatfate.bazi.chart.v2 事实
 - 不伪造经典原文、章节、出处或引号。
 - 不输出幸运色、幸运数字、方位、改名、开运物等非必要内容。
 - 四域只按冻结映射把已有事实贴到对应领域：给域内方向和行动，不给确定事件、结果保证或人格宿命，执行“贴域不贴命”。
-- 当前运段只引用实际字段 `calculatedFacts.currentLuckCycle`：active 时可引用其 `index` 和 `cycle`，not_started 时只能描述 `nextCycle`。当前年只引用 `calculatedFacts.liunian`；不得凭日历、常识或用户反馈猜现实事件。
+- 当前运段只引用实际字段 `calculatedFacts.currentLuckCycle`：active 时可引用其 `index` 和 `cycle`，not_started 时只能描述 `nextCycle`。目标年只引用 `calculatedFacts.liunian`；不得凭日历、常识或用户反馈猜现实事件。
 
 ## 解释流程
 
@@ -43,8 +52,8 @@ description: 基于 ChatFate 排盘引擎生成的 chatfate.bazi.chart.v2 事实
    - `shiyi`：说明事实关系、正面条件与反面约束。
    - `cankao`：给白名单内的行动方向。
 6. 从日主与月令开始，再讨论五行结构、十神组合、显隐层次、干支关系及工具给出的大运。不要为了“完整”制造结论。
-7. 全盘分析完成后收敛 3–5 条 `synopsis` 命局速写。每条是判断句，至少引用两个独立事实组；不写万金油、人格宿命或引擎未给出的旺衰／格局。
-8. 按规范顺序生成三层盘理模块和四域，再写职责不同的三层 `overallGuidance`；不得复制或拆句填层。
+7. life 全盘分析完成后收敛 3–5 条 `synopsis` 命局速写。每条是判断句，至少引用两个独立事实组；不写万金油、人格宿命或引擎未给出的旺衰／格局。
+8. life 按规范顺序生成三层盘理模块和四域，再写职责不同的三层 `overallGuidance`；不得复制或拆句填层。
 9. 对每条解释附加至少一个 `evidenceRefs`，仅允许引用 `calculatedFacts.*`。
    数组索引可写成 `calculatedFacts.luckCycles.0` 或 `calculatedFacts.luckCycles[0]`；不要使用带引号的方括号属性。
 10. 根据证据直接程度标记 `low`、`medium` 或 `high`。传统解释通常不超过 `medium`；`high` 仅用于逐字忠实地复述工具事实。置信度标记证据直接程度，不是现实事件发生概率。解释中明确传统框架或条件，不把推论写成已证实的现实事实；低置信内容说明分歧或不写。
@@ -55,9 +64,27 @@ description: 基于 ChatFate 排盘引擎生成的 chatfate.bazi.chart.v2 事实
    - 大运和流年只说明引擎已给事实所对应的阶段主题，不猜现实事件。
    - 四域按固定映射，正反并举，弱处如实配解法。
 12. 解释具体的不确定性与缺失事实，不用通用免责声明填满 boundaries，也不隐去能改变判断的限制。
-13. 严格输出 `chatfate.bazi.interpretation.v3` 对象，不添加聊天式前言或结尾。
+13. life 严格输出 `chatfate.bazi.interpretation.v3` 对象；daily／annual 则输出下方 focused.v1 对象，不添加聊天式前言或结尾。
 
-## 输出合同
+## 今日／年度精简合同
+
+严格输出对象，仅含以下字段，不能混入 `domains`、life 的模块 id 或三层 overallGuidance：
+
+- `schemaVersion: "chatfate.bazi.focused.v1"`。
+- `product`：逐字采用 `reading.product` 的 `daily` 或 `annual`。
+- `synopsis`：2–4 条 Item；默认 3 条，分别给一个主题、一个条件和一个限制，每条至少两个独立事实路径。
+- `modules`：3–5 个互不重复模块，id 只能是 `focus`、`work`、`relationships`、`wellbeing`、`timing`，必须含 `focus`。每个模块的 `duanyu`、`shiyi`、`cankao` 均为非空 Item 数组；默认每层 1 条，条件较复杂时说明层可 2 条。
+- `overallGuidance`：2–4 条 Item 的**扁平数组**；默认 2 条，给不同的可操作步骤，不复制 synopsis 或模块。
+- `boundaries`：2–4 条 Item；默认 2 条，说明具体事实限制及传统解释不证明现实预测能力。
+- Item 始终是 `{ text, evidenceRefs, confidence }`；路径只引用本次 `calculatedFacts.*`，传统解释通常为 medium，直接事实复述才可 high。
+
+今日指引：至少有一条实质判断把已知命盘事实与 `calculatedFacts.dailyTransit.dayPillar` 相联系；不可只写静态人格和泛用日签。可引用已经给出的 dailyTransit.monthPillar／yearPillar 作背景。默认模块 `focus → work → relationships`，只有具体依据时替换或增加 wellbeing／timing。给今天能做的一小步；不制造吉凶分数、幸运色／数字／方位、具体小时、涨跌、财务或健康结果。午夜换日是计算口径，不代表特定时刻发生事件。建议正文 450–700 中文字。
+
+年度主题：至少有一条实质判断把 `calculatedFacts.liunian` 与命盘／`currentLuckCycle` 联系起来，不能只改标题年份。默认模块 `focus → work → relationships → wellbeing`，只提供全年参考主题、约束及可以核对的计划；没有引擎逐月事实就不拆成月份、季度或具体日期预测。7 月 1 日快照与立春流年口径，以及年内运段可能切换的限制应在相关判断旁说明。建议正文 700–1,000 中文字。
+
+精简合同每条只贡献独立信息，不填满上限。两个产品都不含付费营销、升级提示或“付费才能知道风险”的文案。免费与解锁状态由报告站呈现。
+
+## 人生命盘输出合同
 
 - `schemaVersion`：固定为 `chatfate.bazi.interpretation.v3`。
 - `synopsis`：3–5 条；每条至少两个独立事实组。
@@ -94,6 +121,7 @@ description: 基于 ChatFate 排盘引擎生成的 chatfate.bazi.chart.v2 事实
 - 事实复述用 `high`，传统解释通常用 `medium`，候选冲突或资料不足用 `low`；不把置信度当成预测准确率。
 - 行动是反思建议，不是卦盘证明的现实结论。例：“先列出可接受的条件，再向对方确认”，比“把握机会”更可执行。
 - 方法边界集中说明一次，具体限制保留在相关判断旁。可以明确说“不足以判断”，不要为了直接而强行断定，也不连续重复空泛免责。
+- 正文用自然语言解释具体依据，不展示字段名、schema、质量门槛或“引擎映射／模型不得”等内部审校指令。
 - 事后能解释某个结果，不证明事前能预测；不声称科学验证、准确率或专业结论。
-- 默认 synopsis 3 条、4 个必需 modules；每模块三层各 1 条。四域各 duanyu 1 条、shiyi 2 条（条件与限制各一条）、cankao 1 条；overallGuidance 用 1/1/2 条，boundaries 3 条。仅新增独立信息时增加条目，不为填满 schema 上限扩写。
-- 正文建议约 1,200–1,800 中文字，每条通常 25–70 字；这是编辑目标，不得牺牲必要证据或漏掉必需字段。
+- life 默认 synopsis 3 条、4 个必需 modules；每模块三层各 1 条。四域各 duanyu 1 条、shiyi 2 条（条件与限制各一条）、cankao 1 条；overallGuidance 用 1/1/2 条，boundaries 3 条。仅新增独立信息时增加条目，不为填满 schema 上限扩写。
+- life 正文建议约 1,200–1,800 中文字，每条通常 25–70 字；这是编辑目标，不得牺牲必要证据或漏掉必需字段。

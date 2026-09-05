@@ -1,6 +1,6 @@
 interface:
   display_name: "问事起卦解读"
-  short_description: "依据确定性六爻卦盘生成判词先行、三层展开且有事实引用的问事解读"
+  short_description: "为一事一问提供有事实引用、条件和行动建议的确定性六爻解读"
   default_prompt: "使用 $liuyao 按当前六爻 v2 合同解读结构化卦盘。"
 
 policy:

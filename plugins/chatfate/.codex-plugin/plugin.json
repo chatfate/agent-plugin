@@ -1,7 +1,7 @@
 {
   "name": "chatfate",
-  "version": "0.6.0+codex.20260905",
-  "description": "在 Codex 中完成六爻、八字排盘，阅读有依据、有边界的私密解读。",
+  "version": "0.7.0+codex.20260905",
+  "description": "在 Codex 中看今日、年度、人生命盘，或问眼前的一件事。",
   "author": {
     "name": "ChatFate",
     "url": "https://chatfate.cc"
@@ -12,8 +12,8 @@
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "ChatFate",
-    "shortDescription": "问六爻、看八字，读懂依据与下一步。",
-    "longDescription": "先在卡片中填写问题或出生信息，由固定引擎排盘，再由 Codex 解释。报告先呈现概要与行动建议，可展开依据、回看和打印。Google 登录关联账号，完整报告按页面说明解锁。传统文化体验与自我反思，不保证现实预测。",
+    "shortDescription": "今日、年度、人生与一事一问。",
+    "longDescription": "在卡片中选择今日指引、年度主题、人生命盘或一事一问。固定引擎排盘，Codex 解读；先读概要，再展开依据，可回看与打印。Google 登录保存报告，今日每账号每天一份免费，其他完整报告按页面说明解锁。适合传统文化体验与自我反思，不保证现实预测。",
     "developerName": "ChatFate",
     "category": "Productivity",
     "capabilities": [
@@ -29,8 +29,8 @@
     "logoDark": "./assets/logo.png",
     "defaultPrompt": [
       "开始使用 ChatFate",
-      "帮我排八字",
-      "帮我用六爻问一卦"
+      "看看我的年度主题",
+      "围绕一件事问一卦"
     ]
   }
 }

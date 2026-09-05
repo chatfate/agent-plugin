@@ -13,15 +13,16 @@
 ## 外层报告与写入版本
 
 - 外层 `schemaVersion` 固定为 `chatfate.report.v2`。
-- 八字当前写入只接受 `chatfate.bazi.chart.v2` 与 `chatfate.bazi.interpretation.v3`。
+- 八字 life 写入 `chatfate.bazi.chart.v2` 与 `chatfate.bazi.interpretation.v3`；daily／annual 写入同版本 chart 与 `chatfate.bazi.focused.v1`，product 必须与 calculation.reading 一致。
 - 六爻当前写入只接受 `chatfate.liuyao.chart.v2` 与 `chatfate.liuyao.interpretation.v2`。
 - 历史八字 interpretation 只用于旧加密报告读取，不迁移、不重写，也不得进入新报告写入。
-- 新报告中的排盘事实与 interpretation Schema 合同保持不变；本次只改变存储与访问合同。
+- `reading` 由服务器保存的产品范围生成：daily 包含服务器权威日期与 Asia/Shanghai，annual 包含目标年，life／question 只含 product。不得手拼或更改 reading。
 - `reportId`、`documentSerial`、明文 report envelope、receipt、幂等、删除和链接合同由 MCP 与 Schema 管理；Skill 不自行拼装或改写。
 
 ## 存储与访问
 
-- 持有完整链接即拥有该报告的读取权限；链接应像凭据一样只交给预期读者。
+- 新报告的完整链接用于定位报告；读取仍须登录生成报告的 Google 账号，并满足该产品的权益条件。链接本身不会绕过账号归属或解锁检查。
+- 早期未关联账号的报告保留兼容访问：这类链接可能仍是读取凭据，只交给预期读者。
 - 明文 `ReportV2` 保存在 ChatFate 报告站的 D1，与当前用户关联；用户可随时自行删除自己的报告。
 - 新报告的 `accessId` 是 256-bit 随机值，以 43 字符 base64url 放在 `/report/<accessId>` 路径中；新报告链接不含 fragment，也没有客户端解密密钥。
 - `CHATFATE_REPORT_WRITE_SECRET` 保护 `POST` 写入；`deleteToken` 保护 `DELETE`，且只删除对应报告。读取不携带这两种写入或删除凭据。
@@ -49,6 +50,14 @@
 - `boundaries`：3–5 条，只写真实口径、缺失事实和适用边界，不隐去能改变判断的限制。
 
 `overallGuidance` 三层正文规范化后不得重复；不得复制同一文本、拆句填层或把旧扁平数组自动映射成三层。
+
+## 今日／年度 focused v1
+
+- `schemaVersion: "chatfate.bazi.focused.v1"`；`product: daily|annual` 与计算结果一致。
+- `synopsis` 2–4 条；模块 3–5 个不重复 id，限定 focus／work／relationships／wellbeing／timing，必须含 focus，每模块三层非空。
+- `overallGuidance` 是 2–4 条 Item 的扁平数组；`boundaries` 2–4 条。没有 domains，也不套用 life 的模块 id。
+- daily 必须引用 dailyTransit 的真实日干支事实；日期以服务器北京时间当天为准。annual 必须引用所选年的 liunian；7 月 1 日快照仅支持年度主题参照，不扩写逐月预测。
+- 具体内容、证据与默认精简条目数遵循八字 Skill 的“今日／年度精简合同”。
 
 ## 六爻 interpretation v2
 

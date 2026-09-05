@@ -1,7 +1,7 @@
 interface:
   display_name: "八字命局解读"
-  short_description: "依据确定性排盘事实生成判断先行的命局速写、四域参考与三层报告"
-  default_prompt: "使用 $bazi 按当前八字 v3 合同解读结构化排盘。"
+  short_description: "依据确定性八字事实，生成今日指引、年度主题或完整人生命盘"
+  default_prompt: "使用 $bazi 根据 reading.product 选择 focused.v1 或 life v3 合同解读结构化排盘。"
 
 policy:
   allow_implicit_invocation: false
