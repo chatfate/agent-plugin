@@ -1,7 +1,7 @@
 {
   "name": "chatfate",
-  "version": "0.5.7+codex.20260905",
-  "description": "Generate deterministic Bazi or Liuyao charts and evidence-linked reports in Codex.",
+  "version": "0.6.0+codex.20260905",
+  "description": "在 Codex 中完成六爻、八字排盘，阅读有依据、有边界的私密解读。",
   "author": {
     "name": "ChatFate",
     "url": "https://chatfate.cc"
@@ -12,8 +12,8 @@
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "ChatFate",
-    "shortDescription": "Choose Liuyao or Bazi and generate a private structured report.",
-    "longDescription": "ChatFate presents a two-stage card for Liuyao or Bazi, calculates deterministic facts on its hosted service, asks Codex for evidence-linked interpretation, and opens a private report in the built-in Browser.",
+    "shortDescription": "问六爻、看八字，读懂依据与下一步。",
+    "longDescription": "先在卡片中填写问题或出生信息，由固定引擎排盘，再由 Codex 解释。报告先呈现概要与行动建议，可展开依据、回看和打印。Google 登录关联账号，完整报告按页面说明解锁。传统文化体验与自我反思，不保证现实预测。",
     "developerName": "ChatFate",
     "category": "Productivity",
     "capabilities": [
