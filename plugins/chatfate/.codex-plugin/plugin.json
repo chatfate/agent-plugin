@@ -1,7 +1,7 @@
 {
   "name": "chatfate",
-  "version": "0.8.0+codex.20260905",
-  "description": "在 Codex 中看今日、年度、人生命盘，或问眼前的一件事。",
+  "version": "0.9.0+codex.20260905",
+  "description": "在 Codex 中问一件事、认识自己，也可看今日与年度。",
   "author": {
     "name": "ChatFate",
     "url": "https://chatfate.cc"
@@ -12,8 +12,8 @@
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "ChatFate",
-    "shortDescription": "今日、年度、人生与一事一问。",
-    "longDescription": "在卡片中选择今日指引、年度主题、人生命盘或一事一问。固定引擎排盘，Codex 解读；先读概要，再展开依据，可回看与打印。Google 登录保存报告，今日每账号每天一份免费，其他完整报告按页面说明解锁。适合传统文化体验与自我反思，不保证现实预测。",
+    "shortDescription": "问一件事，或多认识自己一点。",
+    "longDescription": "从问一件事或看自己开始，也可看今日与年度。固定引擎排盘，Codex 根据本问与依据解读；先免费读概要与完整一章，再按需解锁。Google 登录保存报告，可回看、打印或删除。今日免费，具体权益以报告页为准。传统文化参考，不保证现实预测。",
     "developerName": "ChatFate",
     "category": "Productivity",
     "capabilities": [

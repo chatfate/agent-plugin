@@ -1,7 +1,7 @@
 interface:
   display_name: "问事起卦解读"
-  short_description: "为一事一问提供有事实引用、条件和行动建议的确定性六爻解读"
-  default_prompt: "使用 $liuyao 按当前六爻 v2 合同解读结构化卦盘。"
+  short_description: "为一事一问提供有事实引用、传统依据与条件分析的六爻解读"
+  default_prompt: "使用 $liuyao 根据本次问题、卦盘和用户陈述撰写 chatfate.reading.interpretation.v1，解释支持、牵制和改变判断的条件。"
 
 policy:
   allow_implicit_invocation: false

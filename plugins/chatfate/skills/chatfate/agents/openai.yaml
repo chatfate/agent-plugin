@@ -1,6 +1,6 @@
 interface:
   display_name: "ChatFate"
-  short_description: "在卡片中选择今日、年度、人生或问事报告，基于确定性事实解读"
+  short_description: "从问一件事或看自己开始，先读概要与完整预览，再按需深入"
   default_prompt: "使用 $chatfate 开始使用 ChatFate。"
 
 policy:
