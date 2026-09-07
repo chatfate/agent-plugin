@@ -1,7 +1,7 @@
 interface:
   display_name: "八字命局解读"
   short_description: "依据确定性八字事实，生成今日指引、年度主题或完整人生命盘"
-  default_prompt: "使用 $bazi 根据本次排盘、reading.product 与 userContext 撰写 chatfate.reading.interpretation.v1，给出完整预览主题和有新增信息的深入主题。"
+  default_prompt: "使用 $bazi 根据本次排盘、reading.product 与 userContext 分支写作：life使用计算结果中authoring.version=life.v1的完整authoring.instructions，不读取本地方法，以minimalFacts一次形成17 MODULE并提交chatfate.bazi.life.interpretation.v1原文；daily/annual继续chatfate.reading.interpretation.v1。"
 
 policy:
   allow_implicit_invocation: false

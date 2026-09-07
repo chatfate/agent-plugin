@@ -1,3 +1,7 @@
+# 分支说明
+
+life按计算结果的authoring.instructions读取minimalFacts，正文不要求逐段引用/source/confidence；格局与喜用由完整方法解释，不能冒充引擎事实。下文路径指南只用于daily/annual与旧合同。
+
 # 八字依据与来源
 
 calculated/traditional 段只引用实际存在的 calculatedFacts 路径；user 段只引用 userContext；practical 段可引用相关背景或使用空数组。实际建议不能因挂了一个日柱引用就变成计算事实。

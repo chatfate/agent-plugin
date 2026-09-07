@@ -1,6 +1,6 @@
 {
   "name": "chatfate",
-  "version": "0.9.0+codex.20260905",
+  "version": "0.9.1",
   "description": "在 Codex 中问一件事、认识自己，也可看今日与年度。",
   "author": {
     "name": "ChatFate",
@@ -13,7 +13,7 @@
   "interface": {
     "displayName": "ChatFate",
     "shortDescription": "问一件事，或多认识自己一点。",
-    "longDescription": "从问一件事或看自己开始，也可看今日与年度。固定引擎排盘，Codex 根据本问与依据解读；先免费读概要与完整一章，再按需解锁。Google 登录保存报告，可回看、打印或删除。今日免费，具体权益以报告页为准。传统文化参考，不保证现实预测。",
+    "longDescription": "从问一件事或看自己开始，也可看今日与年度。固定引擎排盘，Codex 根据本问与依据解读。看自己免费展示出生信息、基础命盘与命局概览，从“命局与性情”起按需解锁；其他产品按报告页的试读与权益规则展示。Google 登录保存报告，可回看、打印或删除。今日免费。传统文化参考，不保证现实预测。",
     "developerName": "ChatFate",
     "category": "Productivity",
     "capabilities": [

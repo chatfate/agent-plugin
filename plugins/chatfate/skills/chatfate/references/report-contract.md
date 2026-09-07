@@ -1,20 +1,28 @@
 # 报告契约
 
+本文件供 daily/annual/question 使用；life 标准路径使用计算结果中 `authoring.version: life.v1` 对应的完整 `authoring.instructions`，所需方法与原文契约已随事实返回，不再额外读取本文件。
+
 ## 写入与恢复
 
 - 模型只提交 `{ calculationId, interpretation }`。`submissionId`、`calculationId` 是短期不透明标识，外层报告固定为 `chatfate.report.v2`。
-- 新解释统一用 `chatfate.reading.interpretation.v1`。`product` 为 daily／annual／life／question，必须等于计算工具返回的 reading.product；八字对应前三种，六爻对应 question。
+- daily/annual/question新解释用 `chatfate.reading.interpretation.v1`。`product` 为 daily／annual／question，必须等于计算工具返回的 reading.product；八字对应前两种，六爻对应 question；新life使用下方独立合同。
 - chart、reading、userContext、报告编号、删除凭据与链接都由服务器从已保存的计算结果生成。不得重传原始输入、手拼 envelope、改写事实或给用户添加背景。
 - 旧八字 v3、focused v1 和六爻 v2 解释只兼容已开始的旧客户端流程及历史读取。新流程不使用旧三层模板。
-- 同一 calculationId 重试返回原报告；已经成功写入后，换一份解释不会覆盖它。网络失败保留原参数；格式或质量失败仅修改指出的字段。
+- 同一 calculationId 重试返回原报告；已经成功写入后，换一份解释不会覆盖它。网络失败保留原参数；life技术格式或保存失败保留原文并如实报告，不二次修稿；其他产品仅修改指出字段。
 
-## 新解释形状
+## life原文合同
 
-精确 JSON Schema 可由 `chatfate://schemas/reading-interpretation-v1` 读取。当前结构：
+life读取本次单份minimalFacts与完整 `authoring.instructions`，一次形成17 MODULE。新life interpretation仅有schemaVersion:"chatfate.bazi.life.interpretation.v1"、product:"life"、text三个字段；精确资源为chatfate://schemas/bazi-life-interpretation-v1。正文原文唯一权威保存，不另生成结构化副本；不加逐段source/evidenceRefs/confidence，不要求六句固定说明字段。格局/喜用是有条件的传统解释，不需要先由机器定论。
+
+服务器仅按 Schema 验证字段与非空字符串，不扫描正文含义、不对自然语言判断设拒收门禁；模块与标签的解析诊断用于展示降级，保留原文。新事业、财富栏目按方法表达修订 r2，旧报告标签继续识别，不要求迁移。本人可读的免费范围为基础命盘资料与完整Hero命局图版，图版后进入解锁区；“命局与性情”及以后的分析正文不提前下发。旧reading-life仅保留原有synopsis概览与实际章节名称，不返回整章或个性化teaser；旧完整正文不迁移。该范围只控制读取投影，不改变Writer和完整保存合同。技术格式或保存失败如实报告；网络重试仅复用同一原文和calculationId，不调用第二模型重写。
+
+## daily/annual/question解释形状
+
+精确 JSON Schema 可由 `chatfate://schemas/reading-interpretation-v1` 读取；其life枚举仅保留旧客户端兼容，新life不选择此结构。其他产品当前写作结构：
 
 ```text
 schemaVersion: "chatfate.reading.interpretation.v1"
-product: "daily" | "annual" | "life" | "question"
+product: "daily" | "annual" | "question"
 synopsis: Passage[1..4]
 chapters: { id, title, teaser, paragraphs: Passage[1..6] }[2..6]
 previewChapterId: 已有章的 id
@@ -41,7 +49,7 @@ boundaries: Passage[0..3]
 - daily 必须把当天 dailyTransit 与本命事实合看；不编造幸运色、小时吉凶、价格涨跌等未计算内容。
 - annual 结合目标年与本命。按月解释只用 annualTransit.months 的真实节气段、干支和关系，不将节气月当公历月，不保证事件会发生。
 - question 围绕所问解释卦意、用神、动变及冲突。比较题只分析用户真实给出的选择；缺少条件时直说不能据此区分，不凭空指定 A/B 谁更好。敏感问题按表达边界收窄，不输出命理诊断或交易指令。
-- life 选择命局中最有解释价值且与关注点有关的主题。不强制写四域，也不靠星名和通用建议增加篇幅。
+- life 使用上述独立原文合同，四域完整且独立，弱信号短写，遵循17模块职责。以下previewChapterId等字段只属于其他产品。
 
 previewChapterId 指向一篇完整、可独立阅读的篇章；与概要一起交代当前判断、主要依据与重要限制。其余篇章提供新的分析，不复述预览，不把必要限制留作付费内容。nextSteps 和 boundaries 可以为空；正文已充分说清时，不另凑重复条目。
 

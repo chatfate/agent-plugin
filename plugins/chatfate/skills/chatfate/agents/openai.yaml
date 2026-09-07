@@ -1,7 +1,7 @@
 interface:
   display_name: "ChatFate"
   short_description: "从问一件事或看自己开始，先读概要与完整预览，再按需深入"
-  default_prompt: "使用 $chatfate 开始使用 ChatFate。"
+  default_prompt: "使用 $chatfate 开始使用 ChatFate；八字计算传lifeAuthoringVersion=life.v1，life使用返回的完整authoring.instructions与minimalFacts一次写17 MODULE原文，不读取本地方法，其他产品沿原合同。"
 
 policy:
   allow_implicit_invocation: true
